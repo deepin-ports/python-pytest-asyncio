@@ -2,6 +2,182 @@
 Changelog
 =========
 
+All notable changes to this project will be documented in this file.
+
+The format is based on `Keep a Changelog <https://keepachangelog.com/en/1.1.0/>`__, and this project adheres to `Semantic Versioning <https://semver.org/spec/v2.0.0.html>`__.
+
+This project uses `towncrier <https://towncrier.readthedocs.io/>`__ for changelog management and the changes for the upcoming release can be found in https://github.com/pytest-dev/pytest-asyncio/tree/main/changelog.d/.
+
+.. towncrier release notes start
+
+`1.4.0 <https://github.com/pytest-dev/pytest-asyncio/tree/1.4.0>`_ - 2026-05-26
+===============================================================================
+
+Deprecated
+----------
+
+- Overriding the *event_loop_policy* fixture is deprecated. Use the ``pytest_asyncio_loop_factories`` hook instead. (`#1419 <https://github.com/pytest-dev/pytest-asyncio/issues/1419>`_)
+
+
+Added
+-----
+
+- Added the ``pytest_asyncio_loop_factories`` hook to parametrize asyncio tests with custom event loop factories.
+
+  The hook returns a mapping of factory names to loop factories, and ``pytest.mark.asyncio(loop_factories=[...])`` selects a subset of configured factories per test. When a single factory is configured, test names are unchanged.
+
+  Synchronous ``@pytest_asyncio.fixture`` functions now see the correct event loop when custom loop factories are configured, even when test code disrupts the current event loop (e.g., via ``asyncio.run()`` or ``asyncio.set_event_loop(None)``). (`#1164 <https://github.com/pytest-dev/pytest-asyncio/issues/1164>`_)
+
+
+Changed
+-------
+
+- Improved the readability of the warning message that is displayed when ``asyncio_default_fixture_loop_scope`` is unset (`#1298 <https://github.com/pytest-dev/pytest-asyncio/issues/1298>`_)
+- Only import ``asyncio.AbstractEventLoopPolicy`` for type checking to avoid raising
+  a DeprecationWarning. (`#1394 <https://github.com/pytest-dev/pytest-asyncio/issues/1394>`_)
+- Updated minimum supported pytest version to v8.4.0. (`#1397 <https://github.com/pytest-dev/pytest-asyncio/issues/1397>`_)
+
+
+Fixed
+-----
+
+- Fixed a ``ResourceWarning: unclosed event loop`` warning that could occur when a synchronous test called ``asyncio.run()`` or otherwise unset the current event loop after pytest-asyncio had run an async test or fixture. (`#724 <https://github.com/pytest-dev/pytest-asyncio/issues/724>`_)
+
+
+Notes for Downstream Packagers
+------------------------------
+
+- Added dependency on ``sphinx-tabs >= 3.5`` to organize documentation examples into tabs. (`#1395 <https://github.com/pytest-dev/pytest-asyncio/issues/1395>`_)
+
+
+`1.3.0 <https://github.com/pytest-dev/pytest-asyncio/tree/1.3.0>`_ - 2025-11-10
+===============================================================================
+
+Removed
+-------
+
+- Support for Python 3.9 (`#1278 <https://github.com/pytest-dev/pytest-asyncio/issues/1278>`_)
+
+
+Added
+-----
+
+- Support for pytest 9 (`#1279 <https://github.com/pytest-dev/pytest-asyncio/issues/1279>`_)
+
+
+Notes for Downstream Packagers
+------------------------------
+
+- Tested Python versions include free threaded Python 3.14t (`#1274 <https://github.com/pytest-dev/pytest-asyncio/issues/1274>`_)
+- Tests are run in the same pytest process, instead of spawning a subprocess with `pytest.Pytester.runpytest_subprocess`. This prevents the test suite from accidentally using a system installation of pytest-asyncio, which could result in test errors. (`#1275 <https://github.com/pytest-dev/pytest-asyncio/issues/1275>`_)
+
+
+`1.2.0 <https://github.com/pytest-dev/pytest-asyncio/tree/1.2.0>`_ - 2025-09-12
+===============================================================================
+
+Added
+-----
+
+- ``--asyncio-debug`` CLI option and ``asyncio_debug`` configuration option to enable asyncio debug mode for the default event loop. (`#980 <https://github.com/pytest-dev/pytest-asyncio/issues/980>`_)
+- A ``pytest.UsageError`` for invalid configuration values of ``asyncio_default_fixture_loop_scope`` and ``asyncio_default_test_loop_scope``. (`#1189 <https://github.com/pytest-dev/pytest-asyncio/issues/1189>`_)
+- Compatibility with the `Pyright` type checker (`#731 <https://github.com/pytest-dev/pytest-asyncio/issues/731>`_)
+
+
+Fixed
+-----
+
+- ``RuntimeError: There is no current event loop in thread 'MainThread'`` when any test unsets the event loop (such as when using ``asyncio.run`` and ``asyncio.Runner``). (`#1177 <https://github.com/pytest-dev/pytest-asyncio/issues/1177>`_)
+- Deprecation warning when decorating an asynchronous fixture with ``@pytest.fixture`` in `strict` mode. The warning message now refers to the correct package. (`#1198 <https://github.com/pytest-dev/pytest-asyncio/issues/1198>`_)
+
+
+Notes for Downstream Packagers
+------------------------------
+
+- Bump the minimum required version of tox to v4.28. This change is only relevant if you use the ``tox.ini`` file provided by pytest-asyncio to run tests.
+- Extend dependency on typing-extensions>=4.12 from Python<3.10 to Python<3.13.
+
+
+`1.1.0 <https://github.com/pytest-dev/pytest-asyncio/tree/1.1.0>`_ - 2025-07-16
+===============================================================================
+
+Added
+-----
+
+- Propagation of ContextVars from async fixtures to other fixtures and tests on Python 3.10 and older (`#127 <https://github.com/pytest-dev/pytest-asyncio/issues/127>`_)
+- Cancellation of tasks when the `loop_scope` ends (`#200 <https://github.com/pytest-dev/pytest-asyncio/issues/200>`_)
+- Warning when the current event loop is closed by a test
+
+
+Fixed
+-----
+
+- Error about missing loop when calling functions requiring a loop in the `finally` clause of a task (`#878 <https://github.com/pytest-dev/pytest-asyncio/issues/878>`_)
+- An error that could cause duplicate warnings to be issued
+
+
+Notes for Downstream Packagers
+------------------------------
+
+- Added runtime dependency on `backports.asyncio.runner <https://pypi.org/project/backports.asyncio.runner/>`__ for use with Python 3.10 and older
+
+
+`1.0.0 <https://github.com/pytest-dev/pytest-asyncio/tree/1.0.0>`_ - 2025-05-26
+===============================================================================
+
+.. seealso::
+
+   :ref:`How to migrate from pytest-asyncio v0.23 <how_to_guides/migrate_from_0_23>`
+
+Removed
+-------
+
+- The deprecated *event_loop* fixture. (`#1106 <https://github.com/pytest-dev/pytest-asyncio/issues/1106>`_)
+
+
+Added
+-----
+
+- Prelimiary support for Python 3.14 (`#1025 <https://github.com/pytest-dev/pytest-asyncio/issues/1025>`_)
+
+
+Changed
+-------
+
+- Scoped event loops (e.g. module-scoped loops) are created once rather than per scope (e.g. per module). This reduces the number of fixtures and speeds up collection time, especially for large test suites. (`#1107 <https://github.com/pytest-dev/pytest-asyncio/issues/1107>`_)
+- The *loop_scope* argument to ``pytest.mark.asyncio`` no longer forces that a pytest Collector exists at the level of the specified scope. For example, a test function marked with ``pytest.mark.asyncio(loop_scope="class")`` no longer requires a class surrounding the test. This is consistent with the behavior of the *scope* argument to ``pytest_asyncio.fixture``. (`#1112 <https://github.com/pytest-dev/pytest-asyncio/issues/1112>`_)
+
+
+Fixed
+-----
+
+- An error caused when using pytest's `--setup-plan` option. (`#630 <https://github.com/pytest-dev/pytest-asyncio/issues/630>`_)
+- Unsuppressed import errors with pytest option ``--doctest-ignore-import-errors`` (`#797 <https://github.com/pytest-dev/pytest-asyncio/issues/797>`_)
+- A "fixture not found" error in connection with package-scoped loops (`#1052 <https://github.com/pytest-dev/pytest-asyncio/issues/1052>`_)
+
+
+Notes for Downstream Packagers
+------------------------------
+
+- Removed a test that had an ordering dependency on other tests. (`#1114 <https://github.com/pytest-dev/pytest-asyncio/issues/1114>`_)
+
+
+0.26.0 (2025-03-25)
+===================
+- Adds configuration option that sets default event loop scope for all tests `#793 <https://github.com/pytest-dev/pytest-asyncio/issues/793>`_
+- Improved type annotations for ``pytest_asyncio.fixture`` `#1045 <https://github.com/pytest-dev/pytest-asyncio/pull/1045>`_
+- Added ``typing-extensions`` as additional dependency for Python ``<3.10`` `#1045 <https://github.com/pytest-dev/pytest-asyncio/pull/1045>`_
+
+
+0.25.3 (2025-01-28)
+===================
+- Avoid errors in cleanup of async generators when event loop is already closed `#1040 <https://github.com/pytest-dev/pytest-asyncio/issues/1040>`_
+
+
+0.25.2 (2025-01-08)
+===================
+- Call ``loop.shutdown_asyncgens()`` before closing the event loop to ensure async generators are closed in the same manner as ``asyncio.run`` does `#1034 <https://github.com/pytest-dev/pytest-asyncio/pull/1034>`_
+
+
 0.25.1 (2025-01-02)
 ===================
 - Fixes an issue that caused a broken event loop when a function-scoped test was executed in between two tests with wider loop scope `#950 <https://github.com/pytest-dev/pytest-asyncio/issues/950>`_
@@ -11,11 +187,10 @@ Changelog
 
 0.25.0 (2024-12-13)
 ===================
-- Deprecated: Added warning when asyncio test requests async ``@pytest.fixture`` in strict mode. This will become an error in a future version of flake8-asyncio. `#979 <https://github.com/pytest-dev/pytest-asyncio/pull/979>`_
+- Deprecated: Added warning when asyncio test requests async ``@pytest.fixture`` in strict mode. This will become an error in a future version of pytest-asyncio. `#979 <https://github.com/pytest-dev/pytest-asyncio/pull/979>`_
 - Updates the error message about `pytest.mark.asyncio`'s `scope` keyword argument to say `loop_scope` instead. `#1004 <https://github.com/pytest-dev/pytest-asyncio/pull/1004>`_
 - Verbose log displays correct parameter name: asyncio_default_fixture_loop_scope `#990 <https://github.com/pytest-dev/pytest-asyncio/pull/990>`_
 - Propagates `contextvars` set in async fixtures to other fixtures and tests on Python 3.11 and above. `#1008 <https://github.com/pytest-dev/pytest-asyncio/pull/1008>`_
-
 
 
 0.24.0 (2024-08-22)
@@ -101,6 +276,10 @@ As of v0.23, pytest-asyncio attaches an asyncio event loop to each item of the t
 ===================
 This release is backwards-compatible with v0.21.
 Changes are non-breaking, unless you upgrade from v0.22.
+
+.. seealso::
+
+   :ref:`How to migrate from pytest-asyncio v0.21 <how_to_guides/migrate_from_0_21>`
 
 - BREAKING: The *asyncio_event_loop* mark has been removed. Event loops with class, module, package, and session scopes can be requested via the *scope* keyword argument to the _asyncio_ mark.
 - Introduces the *event_loop_policy* fixture which allows testing with non-default or multiple event loops  `#662 <https://github.com/pytest-dev/pytest-asyncio/pull/662>`_

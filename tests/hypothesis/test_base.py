@@ -14,9 +14,7 @@ from pytest import Pytester
 
 def test_hypothesis_given_decorator_before_asyncio_mark(pytester: Pytester):
     pytester.makeini("[pytest]\nasyncio_default_fixture_loop_scope = function")
-    pytester.makepyfile(
-        dedent(
-            """\
+    pytester.makepyfile(dedent("""\
             import pytest
             from hypothesis import given, strategies as st
 
@@ -24,10 +22,8 @@ def test_hypothesis_given_decorator_before_asyncio_mark(pytester: Pytester):
             @pytest.mark.asyncio
             async def test_mark_inner(n):
                 assert isinstance(n, int)
-            """
-        )
-    )
-    result = pytester.runpytest_subprocess("--asyncio-mode=strict", "-W default")
+            """))
+    result = pytester.runpytest("--asyncio-mode=strict", "-W default")
     result.assert_outcomes(passed=1)
 
 
@@ -45,48 +41,9 @@ async def test_mark_and_parametrize(x, y):
     assert y in (1, 2)
 
 
-def test_can_use_explicit_event_loop_fixture(pytester: Pytester):
-    pytester.makeini("[pytest]\nasyncio_default_fixture_loop_scope = module")
-    pytester.makepyfile(
-        dedent(
-            """\
-            import asyncio
-            import pytest
-            from hypothesis import given
-            import hypothesis.strategies as st
-
-            pytest_plugins = 'pytest_asyncio'
-
-            @pytest.fixture(scope="module")
-            def event_loop():
-                loop = asyncio.get_event_loop_policy().new_event_loop()
-                yield loop
-                loop.close()
-
-            @given(st.integers())
-            @pytest.mark.asyncio
-            async def test_explicit_fixture_request(event_loop, n):
-                semaphore = asyncio.Semaphore(value=0)
-                event_loop.call_soon(semaphore.release)
-                await semaphore.acquire()
-            """
-        )
-    )
-    result = pytester.runpytest_subprocess("--asyncio-mode=strict", "-W default")
-    result.assert_outcomes(passed=1, warnings=2)
-    result.stdout.fnmatch_lines(
-        [
-            '*is asynchronous and explicitly requests the "event_loop" fixture*',
-            "*event_loop fixture provided by pytest-asyncio has been redefined*",
-        ]
-    )
-
-
 def test_async_auto_marked(pytester: Pytester):
     pytester.makeini("[pytest]\nasyncio_default_fixture_loop_scope = function")
-    pytester.makepyfile(
-        dedent(
-            """\
+    pytester.makepyfile(dedent("""\
         import asyncio
         import pytest
         from hypothesis import given
@@ -97,9 +54,7 @@ def test_async_auto_marked(pytester: Pytester):
         @given(n=st.integers())
         async def test_hypothesis(n: int):
             assert isinstance(n, int)
-        """
-        )
-    )
+        """))
     result = pytester.runpytest("--asyncio-mode=auto")
     result.assert_outcomes(passed=1)
 
@@ -107,9 +62,7 @@ def test_async_auto_marked(pytester: Pytester):
 def test_sync_not_auto_marked(pytester: Pytester):
     """Assert that synchronous Hypothesis functions are not marked with asyncio"""
     pytester.makeini("[pytest]\nasyncio_default_fixture_loop_scope = function")
-    pytester.makepyfile(
-        dedent(
-            """\
+    pytester.makepyfile(dedent("""\
         import asyncio
         import pytest
         from hypothesis import given
@@ -122,8 +75,6 @@ def test_sync_not_auto_marked(pytester: Pytester):
             markers = [marker.name for marker in request.node.own_markers]
             assert "asyncio" not in markers
             assert isinstance(n, int)
-        """
-        )
-    )
+        """))
     result = pytester.runpytest("--asyncio-mode=auto")
     result.assert_outcomes(passed=1)

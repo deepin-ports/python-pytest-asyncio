@@ -48,22 +48,58 @@ Test discovery modes
 ====================
 
 Pytest-asyncio provides two modes for test discovery, *strict* and *auto*.
+This can be set through Pytest's ``--asyncio-mode`` command line flag,
+or through the configuration file.
 
+.. tabs::
 
-Strict mode
------------
+   .. group-tab:: Strict mode
 
-In strict mode pytest-asyncio will only run tests that have the *asyncio* marker and will only evaluate async fixtures decorated with ``@pytest_asyncio.fixture``. Test functions and fixtures without these markers and decorators will not be handled by pytest-asyncio.
+      .. code-block:: toml
 
-This mode is intended for projects that want so support multiple asynchronous programming libraries as it allows pytest-asyncio to coexist with other async testing plugins in the same codebase.
+         [tool.pytest.ini_options]
+         asyncio_mode = "strict"
 
-Pytest automatically enables installed plugins. As a result pytest plugins need to coexist peacefully in their default configuration. This is why strict mode is the default mode.
+      In strict mode pytest-asyncio will only run tests that have the *asyncio* marker
+      and will only evaluate async fixtures decorated with ``@pytest_asyncio.fixture``.
+      Test functions and fixtures without these markers and decorators will not be
+      handled by pytest-asyncio.
 
-Auto mode
----------
+      This mode is intended for projects that want to support multiple asynchronous
+      programming libraries as it allows pytest-asyncio to coexist with other async
+      testing plugins in the same codebase.
 
-In *auto* mode pytest-asyncio automatically adds the *asyncio* marker to all asynchronous test functions. It will also take ownership of all async fixtures, regardless of whether they are decorated with ``@pytest.fixture`` or ``@pytest_asyncio.fixture``.
+      Pytest automatically enables installed plugins. As a result pytest plugins
+      need to coexist peacefully in their default configuration. This is why strict
+      mode is the default mode.
 
-This mode is intended for projects that use *asyncio* as their only asynchronous programming library. Auto mode makes for the simplest test and fixture configuration and is the recommended default.
+   .. group-tab:: Auto mode
 
-If you intend to support multiple asynchronous programming libraries, e.g. *asyncio* and *trio*, strict mode will be the preferred option.
+      .. code-block:: toml
+
+         [tool.pytest.ini_options]
+         asyncio_mode = "auto"
+
+      In *auto* mode pytest-asyncio automatically adds the *asyncio* marker to all
+      asynchronous test functions. It will also take ownership of all async fixtures,
+      regardless of whether they are decorated with ``@pytest.fixture`` or
+      ``@pytest_asyncio.fixture``.
+
+      This mode is intended for projects that use *asyncio* as their only asynchronous
+      programming library. Auto mode makes for the simplest test and fixture
+      configuration and is the recommended default.
+
+      If you intend to support multiple asynchronous programming libraries,
+      e.g. *asyncio* and *trio*, strict mode will be the preferred option.
+
+.. _concepts/concurrent_execution:
+
+Test execution and concurrency
+==============================
+
+pytest-asyncio runs async tests sequentially, just like how pytest runs synchronous tests. Each asynchronous test runs within its assigned event loop. For example, consider the following two tests:
+
+.. include:: concepts_concurrent_execution_example.py
+    :code: python
+
+This sequential execution is intentional and important for maintaining test isolation. Running tests concurrently could introduce race conditions and side effects where one test could interfere with another, making test results unreliable and difficult to debug.

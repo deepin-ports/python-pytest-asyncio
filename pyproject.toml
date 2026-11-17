@@ -1,10 +1,8 @@
 [build-system]
 build-backend = "setuptools.build_meta"
-
 requires = [
-  "setuptools>=51",
+  "setuptools>=77",
   "setuptools-scm[toml]>=6.2",
-  "wheel>=0.36",
 ]
 
 [project]
@@ -12,23 +10,28 @@ name = "pytest-asyncio"
 description = "Pytest support for asyncio"
 readme.content-type = "text/x-rst"
 readme.file = "README.rst"
-license.text = "Apache 2.0"
-authors = [
-  { name = "Tin Tvrtković <tinchester@gmail.com>", email = "tinchester@gmail.com" },
+license = "Apache-2.0"
+license-files = [
+  "LICENSE",
 ]
-requires-python = ">=3.9"
+maintainers = [
+  { name = "Michael Seifert", email = "m.seifert@digitalernachschub.de" },
+]
+authors = [
+  { name = "Tin Tvrtković", email = "tinchester@gmail.com" },
+]
+requires-python = ">=3.10"
 classifiers = [
-  "Development Status :: 4 - Beta",
+  "Development Status :: 5 - Production/Stable",
   "Framework :: AsyncIO",
   "Framework :: Pytest",
   "Intended Audience :: Developers",
-  "License :: OSI Approved :: Apache Software License",
   "Programming Language :: Python :: 3 :: Only",
-  "Programming Language :: Python :: 3.9",
   "Programming Language :: Python :: 3.10",
   "Programming Language :: Python :: 3.11",
   "Programming Language :: Python :: 3.12",
   "Programming Language :: Python :: 3.13",
+  "Programming Language :: Python :: 3.14",
   "Topic :: Software Development :: Testing",
   "Typing :: Typed",
 ]
@@ -37,18 +40,21 @@ dynamic = [
 ]
 
 dependencies = [
-  "pytest>=8.2,<9",
+  "backports-asyncio-runner>=1.1,<2; python_version<'3.11'",
+  "pytest>=8.4,<10",
+  "typing-extensions>=4.12; python_version<'3.13'",
 ]
 optional-dependencies.docs = [
   "sphinx>=5.3",
   "sphinx-rtd-theme>=1",
+  "sphinx-tabs>=3.5",
 ]
 optional-dependencies.testing = [
   "coverage>=6.2",
   "hypothesis>=5.7.1",
 ]
 urls."Bug Tracker" = "https://github.com/pytest-dev/pytest-asyncio/issues"
-urls.Changelog = "https://pytest-asyncio.readthedocs.io/en/latest/reference/changelog.html"
+urls.Changelog = "https://pytest-asyncio.readthedocs.io/en/stable/reference/changelog.html"
 urls.Documentation = "https://pytest-asyncio.readthedocs.io"
 urls.Homepage = "https://github.com/pytest-dev/pytest-asyncio"
 urls."Source Code" = "https://github.com/pytest-dev/pytest-asyncio"
@@ -59,12 +65,9 @@ packages = [
   "pytest_asyncio",
 ]
 include-package-data = true
-license-files = [
-  "LICENSE",
-]
 
 [tool.setuptools_scm]
-write_to = "pytest_asyncio/_version.py"
+local_scheme = "no-local-version"
 
 [tool.ruff]
 line-length = 88
@@ -108,6 +111,9 @@ lint.ignore = [
   "D415", # First line should end with a period, question mark, or exclamation point
 ]
 
+[tool.pyproject-fmt]
+max_supported_python = "3.14"
+
 [tool.pytest.ini_options]
 python_files = [
   "test_*.py",
@@ -123,7 +129,6 @@ asyncio_default_fixture_loop_scope = "function"
 junit_family = "xunit2"
 filterwarnings = [
   "error",
-  "ignore:The event_loop fixture provided by pytest-asyncio has been redefined.*:DeprecationWarning",
 ]
 
 [tool.coverage.run]
@@ -132,10 +137,48 @@ source = [
 ]
 branch = true
 data_file = "coverage/coverage"
-omit = [
-  "*/_version.py",
-]
 parallel = true
 
 [tool.coverage.report]
 show_missing = true
+
+[tool.towncrier]
+directory = "changelog.d"
+filename = "docs/reference/changelog.rst"
+title_format = "`{version} <https://github.com/pytest-dev/pytest-asyncio/tree/{version}>`_ - {project_date}"
+issue_format = "`#{issue} <https://github.com/pytest-dev/pytest-asyncio/issues/{issue}>`_"
+
+[[tool.towncrier.type]]
+directory = "security"
+name = "Security"
+showcontent = true
+
+[[tool.towncrier.type]]
+directory = "removed"
+name = "Removed"
+showcontent = true
+
+[[tool.towncrier.type]]
+directory = "deprecated"
+name = "Deprecated"
+showcontent = true
+
+[[tool.towncrier.type]]
+directory = "added"
+name = "Added"
+showcontent = true
+
+[[tool.towncrier.type]]
+directory = "changed"
+name = "Changed"
+showcontent = true
+
+[[tool.towncrier.type]]
+directory = "fixed"
+name = "Fixed"
+showcontent = true
+
+[[tool.towncrier.type]]
+directory = "downstream"
+name = "Notes for Downstream Packagers"
+showcontent = true

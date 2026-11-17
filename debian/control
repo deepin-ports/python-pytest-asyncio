@@ -1,38 +1,32 @@
 Source: python-pytest-asyncio
-Section: python
-Priority: optional
+Standards-Version: 4.7.4
 Maintainer: Debian Python Team <team+python@tracker.debian.org>
-Uploaders: Roland Mas <lolando@debian.org>,
+Uploaders:
+ Roland Mas <lolando@debian.org>,
+Section: python
+Testsuite: autopkgtest-pkg-pybuild
 Build-Depends:
  debhelper-compat (= 13),
  dh-sequence-python3,
  pybuild-plugin-pyproject,
  python3,
- python3-async-generator <!nocheck>,
  python3-flaky <!nocheck>,
- python3-hypothesis (>= 5.7.1) <!nocheck>,
- python3-mypy <!nocheck>,
- python3-pytest (>= 5.4.0) <!nocheck>,
+ python3-hypothesis <!nocheck>,
+ python3-pytest (>= 8.4.0) <!nocheck>,
  python3-pytest-trio <!nocheck>,
  python3-setuptools,
  python3-setuptools-scm,
-Standards-Version: 4.6.1
-Vcs-Git: https://salsa.debian.org/python-team/packages/pytest-asyncio.git
 Vcs-Browser: https://salsa.debian.org/python-team/packages/pytest-asyncio
+Vcs-Git: https://salsa.debian.org/python-team/packages/pytest-asyncio.git
 Homepage: https://github.com/pytest-dev/pytest-asyncio
-Rules-Requires-Root: no
-Testsuite: autopkgtest-pkg-pybuild
 
 Package: python3-pytest-asyncio
 Architecture: all
 Depends:
- python3-async-generator,
- ${cdbs:Depends},
  ${misc:Depends},
  ${python3:Depends},
-Provides: ${python3:Provides}
-Breaks:
- python3-pytest-mock (<= 3.7.0),
+Provides:
+ ${python3:Provides},
 Description: pytest support for asyncio.
  pytest-asyncio is a ibrary for testing asyncio code with pytest.
  .

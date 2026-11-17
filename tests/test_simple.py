@@ -14,13 +14,6 @@ async def async_coro():
     return "ok"
 
 
-def test_event_loop_fixture(event_loop):
-    """Test the injection of the event_loop fixture."""
-    assert event_loop
-    ret = event_loop.run_until_complete(async_coro())
-    assert ret == "ok"
-
-
 @pytest.mark.asyncio
 async def test_asyncio_marker():
     """Test the asyncio pytest marker."""
@@ -29,9 +22,7 @@ async def test_asyncio_marker():
 
 def test_asyncio_marker_compatibility_with_xfail(pytester: Pytester):
     pytester.makeini("[pytest]\nasyncio_default_fixture_loop_scope = function")
-    pytester.makepyfile(
-        dedent(
-            """\
+    pytester.makepyfile(dedent("""\
                 import pytest
 
                 pytest_plugins = "pytest_asyncio"
@@ -40,18 +31,14 @@ def test_asyncio_marker_compatibility_with_xfail(pytester: Pytester):
                 @pytest.mark.asyncio
                 async def test_asyncio_marker_fail():
                     raise AssertionError
-            """
-        )
-    )
+            """))
     result = pytester.runpytest("--asyncio-mode=strict")
     result.assert_outcomes(xfailed=1)
 
 
 def test_asyncio_auto_mode_compatibility_with_xfail(pytester: Pytester):
     pytester.makeini("[pytest]\nasyncio_default_fixture_loop_scope = function")
-    pytester.makepyfile(
-        dedent(
-            """\
+    pytester.makepyfile(dedent("""\
                 import pytest
 
                 pytest_plugins = "pytest_asyncio"
@@ -59,9 +46,7 @@ def test_asyncio_auto_mode_compatibility_with_xfail(pytester: Pytester):
                 @pytest.mark.xfail(reason="need a failure", strict=True)
                 async def test_asyncio_marker_fail():
                     raise AssertionError
-            """
-        )
-    )
+            """))
     result = pytester.runpytest("--asyncio-mode=auto")
     result.assert_outcomes(xfailed=1)
 
